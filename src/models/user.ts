@@ -1,17 +1,18 @@
 import client from "../database";
 
-export type Product = {
+export type User = {
   id: Number;
-  name: String;
-  price: Number;
-  category: String;
+  firstName: String;
+  lastName: String;
+  password: String;
 };
 
-export class ProductStore {
-  async index(): Promise<Product[]> {
+export class UserStore {
+  //with JWT
+  async index(): Promise<User[]> {
     try {
       const conn = await client.connect();
-      const sql = "SELECT * FROM products";
+      const sql = "SELECT * FROM users";
       const result = await conn.query(sql);
       conn.release();
       return result.rows;
@@ -20,11 +21,9 @@ export class ProductStore {
     }
   }
 
+  //with JWT
   async show(): Promise<void> {}
 
   //with JWT
   async create(): Promise<void> {}
-
-  //optional
-  async ranking(): Promise<void> {}
 }
