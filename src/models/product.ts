@@ -4,7 +4,7 @@ export type Product = {
   id: Number;
   name: String;
   price: Number;
-  category: String;
+  category: String | null;
 };
 
 export class ProductStore {
@@ -20,10 +20,36 @@ export class ProductStore {
     }
   }
 
-  async show(): Promise<void> {}
+  async show(productId: Number): Promise<Product> {
+    try {
+      const conn = await client.connect();
+      const sql = `SELECT * FROM products WHERE id=${productId}`;
+      const result = await conn.query(sql);
+      const product: Product = result.rows[0];
+      conn.release();
+      return product;
+    } catch (error) {
+      throw new Error(`Cannot get product by ID: ${error}`);
+    }
+  }
 
   //with JWT
-  async create(): Promise<void> {}
+  async create(
+    name: string,
+    price: number,
+    category: string | null
+  ): Promise<Product> {
+    try {
+      const conn = await client.connect();
+      const sql = `INSERT INTO products (name, price, category) VALUES ($1, $2, $3) RETURNING *`;
+      const result = await conn.query(sql, [name, price, category]);
+      const new_product: Product = result.rows[0];
+      conn.release();
+      return new_product;
+    } catch (error) {
+      throw new Error(`Cannot create product: ${error}`);
+    }
+  }
 
   //optional
   async ranking(): Promise<void> {}
