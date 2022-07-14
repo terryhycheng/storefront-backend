@@ -1,15 +1,19 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, RequestHandler } from "express";
 import { Product, ProductStore } from "../models/product";
+import jwt from "jsonwebtoken";
 
 const store = new ProductStore();
+const token_secret = process.env.TOKEN_SECRET;
 
 //ROUTES
 const product_routes = (app: express.Application) => {
-  app.get("/products", index);
-  app.get("/products/:id", show);
+  app.get("/products", verifyAuthToken, index);
+  app.get("/products/:id", verifyAuthToken, show);
   //GET by category
-  app.post("/products", create);
+  app.post("/products", verifyAuthToken, create);
   app.get("/products/ranking", ranking);
+  app.put("/products/:id", verifyAuthToken, update);
+  app.delete("/products/:id", verifyAuthToken, destroy);
 };
 
 const index = async (req: Request, res: Response): Promise<void> => {
@@ -39,9 +43,37 @@ const create = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const update = async (req: Request, res: Response): Promise<void> => {
+  const update = await store.update();
+  res.json(update);
+};
+
+const destroy = async (req: Request, res: Response): Promise<void> => {
+  const destroy = await store.destroy();
+  res.json(destroy);
+};
+
 const ranking = async (req: Request, res: Response): Promise<void> => {
   const ranking = await store.ranking();
   res.json(ranking);
+};
+
+//Custome Middleware
+const verifyAuthToken: RequestHandler = (req, res, next) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (token) {
+      token_secret
+        ? jwt.verify(token, token_secret)
+        : new Error("Token secret is missing in environment.");
+      next();
+    } else {
+      throw new Error("jwt must be provided.");
+    }
+  } catch (error) {
+    res.status(401).send(`Access denied. Invalid token. ${error}`);
+    return;
+  }
 };
 
 export default product_routes;

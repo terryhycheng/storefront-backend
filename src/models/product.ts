@@ -51,6 +51,10 @@ export class ProductStore {
     }
   }
 
+  async update(): Promise<void> {}
+
+  async destroy(): Promise<void> {}
+
   //optional
   async ranking(): Promise<void> {}
 }

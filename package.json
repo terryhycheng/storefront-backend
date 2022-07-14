@@ -8,13 +8,12 @@
     "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess \"node ./dist/server.js\"",
     "jasmine": "jasmine",
     "tsc": "tsc",
-    "test": "set ENV=test&& yarn tsc && db-migrate --env test up && yarn jasmine"
+    "test": "set ENV=test&& yarn tsc && db-migrate --env test up && yarn jasmine && db-migrate --env test reset"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/bcrypt": "^5.0.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.20.0",
     "cors": "^2.8.5",
@@ -22,14 +21,17 @@
     "db-migrate-pg": "^1.2.2",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "jsonwebtoken": "^8.5.1",
     "nodemon": "^2.0.19",
     "pg": "^8.7.3",
     "typescript": "^4.7.4"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/jasmine": "^4.0.3",
+    "@types/jsonwebtoken": "^8.5.8",
     "@types/pg": "^8.6.5",
     "jasmine": "^4.2.1",
     "jasmine-spec-reporter": "^7.0.0",
