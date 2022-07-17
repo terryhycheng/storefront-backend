@@ -1,32 +1,44 @@
 import express, { Request, Response, RequestHandler } from "express";
 import { Product, ProductStore } from "../models/product";
-import jwt from "jsonwebtoken";
+import { verifyAuthToken } from "./verify";
 
 const store = new ProductStore();
-const token_secret = process.env.TOKEN_SECRET;
+
+export type UpdateProduct = {
+  name: String;
+  price: Number;
+  category: String;
+};
 
 //ROUTES
 const product_routes = (app: express.Application) => {
   app.get("/products", verifyAuthToken, index);
-  app.get("/products/:id", verifyAuthToken, show);
-  //GET by category
-  app.post("/products", verifyAuthToken, create);
-  app.get("/products/ranking", ranking);
-  app.put("/products/:id", verifyAuthToken, update);
-  app.delete("/products/:id", verifyAuthToken, destroy);
+  app.get("/product/:id", verifyAuthToken, show);
+  app.post("/product", verifyAuthToken, create);
+  app.get("/product/category/:category", verifyAuthToken, category);
+  app.put("/product/:id", verifyAuthToken, update);
+  app.delete("/product/:id", verifyAuthToken, remove);
 };
 
 const index = async (req: Request, res: Response): Promise<void> => {
-  const products = await store.index();
-  res.json(products);
+  try {
+    const products = await store.index();
+    res.json(products);
+  } catch (error) {
+    res.status(400).send({ message: `${error}` });
+  }
 };
 
 const show = async (req: Request, res: Response): Promise<void> => {
-  const productId: Number = parseInt(req.params.id);
-  const product = await store.show(productId);
-  product
-    ? res.json(product)
-    : res.status(400).send({ message: "No product found." });
+  try {
+    const productId: Number = parseInt(req.params.id);
+    const product = await store.show(productId);
+    product
+      ? res.json(product)
+      : res.status(400).send({ message: "No product found." });
+  } catch (error) {
+    res.status(400).send({ message: `${error}` });
+  }
 };
 
 const create = async (req: Request, res: Response): Promise<void> => {
@@ -38,41 +50,46 @@ const create = async (req: Request, res: Response): Promise<void> => {
     const createdItem: Product = await store.create(name, price, category);
     res.json(createdItem);
   } catch (error) {
-    res.status(400);
-    res.send({ message: `${error}` });
+    res.status(400).send({ message: `${error}` });
   }
 };
 
 const update = async (req: Request, res: Response): Promise<void> => {
-  const update = await store.update();
-  res.json(update);
-};
-
-const destroy = async (req: Request, res: Response): Promise<void> => {
-  const destroy = await store.destroy();
-  res.json(destroy);
-};
-
-const ranking = async (req: Request, res: Response): Promise<void> => {
-  const ranking = await store.ranking();
-  res.json(ranking);
-};
-
-//Custome Middleware
-const verifyAuthToken: RequestHandler = (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (token) {
-      token_secret
-        ? jwt.verify(token, token_secret)
-        : new Error("Token secret is missing in environment.");
-      next();
-    } else {
-      throw new Error("jwt must be provided.");
-    }
+    const product_id: Number = parseInt(req.params.id);
+    const body: UpdateProduct = req.body;
+    const updated_product = await store.update(product_id, body);
+    res.send({ message: "Product was updated!", item: updated_product });
   } catch (error) {
-    res.status(401).send(`Access denied. Invalid token. ${error}`);
-    return;
+    res.status(400).send({ message: `${error}` });
+  }
+};
+
+const remove = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const product_id: Number = parseInt(req.params.id);
+    const deteled_product: Product = await store.remove(product_id);
+    deteled_product
+      ? res
+          .status(200)
+          .send({ message: "Product was deleted!", item: deteled_product })
+      : res.status(404).send({ message: "Product not found" });
+  } catch (error) {
+    res.status(400).send({ message: `${error}` });
+  }
+};
+
+const category = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const category: String = req.params.category;
+    const products: Product[] = await store.category(category);
+    products.length
+      ? res.status(200).send(products)
+      : res
+          .status(404)
+          .send({ message: `No product is found with category '${category}'` });
+  } catch (error) {
+    res.status(400).send({ message: `${error}` });
   }
 };
 

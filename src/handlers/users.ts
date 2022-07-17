@@ -1,24 +1,35 @@
 import express, { Request, Response, RequestHandler } from "express";
 import { User, UserStore } from "../models/user";
+import { Order } from "../models/order";
 import jwt from "jsonwebtoken";
+import { verifyAuthToken, token_secret } from "./verify";
 
 const store = new UserStore();
-const token_secret = process.env.TOKEN_SECRET;
+
+export type UserBody = {
+  username: String;
+  first_name: String;
+  last_name: String;
+  password: String;
+};
 
 //users ROUTES
 const user_routes = (app: express.Application) => {
   app.get("/users", verifyAuthToken, index);
-  app.get("/users/:id", verifyAuthToken, show);
-  app.post("/users", register);
+  app.get("/user/:id", verifyAuthToken, show);
+  app.get("/user/:id/orders", verifyAuthToken, getOrders);
+  app.put("/user/:id", verifyAuthToken, edit);
+  app.delete("/user/:id", verifyAuthToken, remove);
+  app.post("/user", register);
 };
 
-//Require a JWT and show all users
+//Show all users
 const index = async (req: Request, res: Response): Promise<void> => {
   const users: User[] = await store.index();
   res.json(users);
 };
 
-//Require a JWT and show the item WHERE id = *
+//Show the item WHERE id = *
 const show = async (req: Request, res: Response): Promise<void> => {
   const userId: Number = parseInt(req.params.id);
   const user: User = await store.show(userId);
@@ -28,16 +39,8 @@ const show = async (req: Request, res: Response): Promise<void> => {
 //Register and return a JWT
 const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const username: String = req.body.username;
-    const firstName: String = req.body.first_name;
-    const lastName: String = req.body.last_name;
-    const password: String = req.body.password;
-    const user: User = await store.register(
-      username,
-      firstName,
-      lastName,
-      password
-    );
+    const body: UserBody = req.body;
+    const user: User = await store.register(body);
     if (token_secret) {
       const token: String = jwt.sign({ user: user }, token_secret);
       res.json(token);
@@ -49,21 +52,43 @@ const register = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-//Custome Middleware
-const verifyAuthToken: RequestHandler = (req, res, next) => {
+const edit = async (req: Request, res: Response): Promise<void> => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (token) {
-      token_secret
-        ? jwt.verify(token, token_secret)
-        : new Error("Token secret is missing in environment.");
-      next();
-    } else {
-      throw new Error("jwt must be provided.");
-    }
+    const body: UserBody = req.body;
+    const user_id: Number = parseInt(req.params.id);
+    const updated_user: User = await store.edit(user_id, body);
+    res
+      .status(200)
+      .send({ message: "User info was updated!", updated: updated_user });
   } catch (error) {
-    res.status(401).send(`Access denied. Invalid token. ${error}`);
-    return;
+    res.status(400).send({ message: `${error}` });
+  }
+};
+
+//Delete a user with its ID
+const remove = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user_id = parseInt(req.params.id);
+    const deleted_user: User = await store.remove(user_id);
+    res.send({
+      message: `User with ID ( ${user_id} ) was deleted!`,
+      deleted: deleted_user,
+    });
+  } catch (error) {
+    res.status(400).send({ message: `${error}` });
+  }
+};
+
+//Get orders with user ID
+const getOrders = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user_id = parseInt(req.params.id);
+    const orders: Order[] = await store.getOrders(user_id);
+    orders.length
+      ? res.json(orders)
+      : res.send({ message: "No order was found." });
+  } catch (error) {
+    res.status(400).send({ message: `${error}` });
   }
 };
 

@@ -1,6 +1,6 @@
-CREATE TABLE order_producs (
+CREATE TABLE order_products (
   id SERIAL PRIMARY KEY,
   quantity int,
-  order_id bigint REFERENCES orders (id),
-  product_id bigint REFERENCES products (id)
+  order_id int REFERENCES orders (id),
+  product_id int REFERENCES products (id)
 );
