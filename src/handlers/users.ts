@@ -70,10 +70,14 @@ const remove = async (req: Request, res: Response): Promise<void> => {
   try {
     const user_id = parseInt(req.params.id);
     const deleted_user: User = await store.remove(user_id);
-    res.send({
-      message: `User with ID ( ${user_id} ) was deleted!`,
-      deleted: deleted_user,
-    });
+    deleted_user
+      ? res.send({
+          message: `User with ID ( ${user_id} ) was deleted!`,
+          deleted: deleted_user,
+        })
+      : res.status(404).send({
+          message: `User with ID ( ${user_id} ) was not found.`,
+        });
   } catch (error) {
     res.status(400).send({ message: `${error}` });
   }

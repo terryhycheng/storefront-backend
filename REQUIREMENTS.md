@@ -29,7 +29,7 @@ _All are token required_
   - with `requst body` including `name`, `price`, `category`
 - Products by category : `GET` - `/product/:category`
 - Update : `PUT` - `/product/:product_id`
-  - - with `requst body` including `name`, `price`, `category`
+  - with `requst body` including `name`, `price`, `category`
 - Delete : `DELETE` - `/product/:product_id`
 
 #### Users

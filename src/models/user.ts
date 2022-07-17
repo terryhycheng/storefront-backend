@@ -11,8 +11,9 @@ const salt = process.env.SALT_ROUNDS || "12";
 
 export type User = {
   id: Number;
-  firstName: String;
-  lastName: String;
+  username: String;
+  firstname: String;
+  lastname: String;
   password: String;
 };
 

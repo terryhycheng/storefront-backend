@@ -1,5 +1,5 @@
 import express, { Request, Response, RequestHandler } from "express";
-import { Order, OrderStore } from "../models/order";
+import { Item, Order, OrderStore } from "../models/order";
 import { verifyAuthToken } from "./verify";
 
 const store = new OrderStore();
@@ -47,7 +47,7 @@ const addItem = async (req: Request, res: Response): Promise<void> => {
     const order_id: Number = parseInt(req.params.order_id);
     const product_id: Number = parseInt(req.body.product_id);
     const quantity: Number = parseInt(req.body.quantity);
-    const updated_order: Order = await store.addItem(
+    const updated_order: Item = await store.addItem(
       order_id,
       product_id,
       quantity

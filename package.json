@@ -8,7 +8,7 @@
     "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess \"node ./dist/server.js\"",
     "jasmine": "jasmine",
     "tsc": "tsc",
-    "test": "set ENV=test&& yarn tsc && db-migrate db:create for_test  && db-migrate --env test up && yarn jasmine && db-migrate db:drop for_test"
+    "test": "set ENV=test&& yarn tsc && db-migrate db:create for_test && db-migrate --env test up && yarn jasmine && db-migrate db:drop for_test"
   },
   "keywords": [],
   "author": "",
