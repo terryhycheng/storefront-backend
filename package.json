@@ -8,7 +8,8 @@
     "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess \"node ./dist/server.js\"",
     "jasmine": "jasmine",
     "tsc": "tsc",
-    "test": "set ENV=test&& yarn tsc && db-migrate db:create for_test && db-migrate --env test up && yarn jasmine && db-migrate db:drop for_test"
+    "test": "set ENV=test&& yarn tsc && db-migrate db:create for_test && db-migrate --env test up && yarn jasmine && db-migrate db:drop for_test",
+    "test-ep": "yarn tsc && yarn jasmine"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +25,7 @@
     "jsonwebtoken": "^8.5.1",
     "nodemon": "^2.0.19",
     "pg": "^8.7.3",
+    "supertest": "^6.2.4",
     "typescript": "^4.7.4"
   },
   "devDependencies": {
@@ -33,6 +35,7 @@
     "@types/jasmine": "^4.0.3",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/pg": "^8.6.5",
+    "@types/supertest": "^2.0.12",
     "jasmine": "^4.2.1",
     "jasmine-spec-reporter": "^7.0.0",
     "ts-node": "^10.8.2"

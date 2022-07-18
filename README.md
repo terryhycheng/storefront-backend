@@ -60,17 +60,39 @@ TOKEN_SECRET= **
 
 - Make sure [Docker](https://www.docker.com/) is installed in your computer and run `docker-compose up` with the setting in `docker-compose.yml`
 
-### 2. Create Database & start server
+### 2. Create Database & Authorise User
 
-- Create your database by running `db-migrate db:create [Customised Database Name]`
+**Default Database Port: 5432**
+
+- Create your database by running `db-migrate db:create [Customised Database Name]` or via SQL query:
+
+```
+CREATE DATABASE [Customised Database Name]
+```
 
 - Run `db-migrate up` to establish database tables
 
+- Create a new user for database by running the following codes:
+
+```
+CREATE USER {Your username} WITH PASSWORD '{Your password}';
+```
+
+- Grant all database privileges to user in certain database
+
+```
+GRANT ALL PRIVILEGES ON DATABASE [Database Name] TO [Username]
+```
+
+### 3. Start server
+
 - Run `yarn start` or `npm run start` to start server in the default port `3000`
 
-### 3. Testing
+### 4. Testing
 
 - `yarn test` or `npm run test`
+
+_This script will automatically create a database `for_test` for testing and remove it after all tests_
 
 ## Data Structure
 

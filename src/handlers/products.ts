@@ -12,8 +12,8 @@ export type UpdateProduct = {
 
 //ROUTES
 const product_routes = (app: express.Application) => {
-  app.get("/products", verifyAuthToken, index);
-  app.get("/product/:id", verifyAuthToken, show);
+  app.get("/products", index);
+  app.get("/product/:id", show);
   app.post("/product", verifyAuthToken, create);
   app.get("/product/category/:category", verifyAuthToken, category);
   app.put("/product/:id", verifyAuthToken, update);

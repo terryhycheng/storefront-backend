@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.get("/", function (req: Request, res: Response) {
-  res.send("Hello World!");
+  res.send({ message: "Hello World!" });
 });
 
 product_routes(app);
@@ -22,3 +22,5 @@ order_routes(app);
 app.listen(port, function () {
   console.log(`starting app on: http://localhost:${port}`);
 });
+
+export default app;

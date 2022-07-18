@@ -16,8 +16,12 @@ export const order_routes = (app: express.Application) => {
 };
 
 const index = async (req: Request, res: Response): Promise<void> => {
-  const orders: Order[] = await store.index();
-  res.json(orders);
+  try {
+    const orders: Order[] = await store.index();
+    res.json(orders);
+  } catch (error) {
+    res.status(400).send({ message: `${error}` });
+  }
 };
 
 const search = async (req: Request, res: Response): Promise<void> => {
